@@ -15,15 +15,20 @@ class MoviesSearchViewController: UIViewController {
     @IBOutlet weak var moviesSearchTblView: UITableView!
     @IBOutlet weak var movieSearchBar: UISearchBar!
     
+    var activityIndicator = UIActivityIndicatorView()
+
     var page = 1
     var query = String()
     
     var searchData = [SearchApiModel]()
     
-    
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        activityIndicator.activityIndicatorViewStyle = .whiteLarge
+        activityIndicator.center = self.view.center
+        self.view .addSubview(activityIndicator)
+        
         movieSearchBar.delegate = self
         registerNibForTableViewCell()
         self.title = "Search"
@@ -52,6 +57,8 @@ class MoviesSearchViewController: UIViewController {
         
         if (Utility_Swift.isInternetConnected(isShowPopup: true)) {
             
+            activityIndicator.startAnimating()
+            
             var dictionaryHeaders = [String : String]()
             dictionaryHeaders = ["Content-Type": "application/x-www-form-urlencoded"]
             
@@ -64,6 +71,8 @@ class MoviesSearchViewController: UIViewController {
                 .responseJSON { response in
                     switch response.result {
                     case .success(let responseValue) :
+                        
+                        self.activityIndicator.stopAnimating()
                         
                         if let tempDict = responseValue as? NSDictionary {
                             if let tempArray = tempDict["results"] as? NSArray {

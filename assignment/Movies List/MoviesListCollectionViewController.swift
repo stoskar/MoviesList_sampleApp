@@ -15,6 +15,8 @@ class MoviesListCollectionViewController: UIViewController {
     @IBOutlet weak var moviesCollectionView: UICollectionView!
     @IBOutlet weak var segmentoutlet: UISegmentedControl!
     
+    var activityIndicator = UIActivityIndicatorView()
+
     var page = 1
     var movies = [MoviesModel]()
     var moviesFilter = POPULAR_MOVIES
@@ -22,6 +24,10 @@ class MoviesListCollectionViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        
+        activityIndicator.activityIndicatorViewStyle = .whiteLarge
+        activityIndicator.center = self.view.center
+        self.view .addSubview(activityIndicator)
         self.moviesCollectionView.register(UINib(nibName: "MoviesCollectionViewCell", bundle: nil), forCellWithReuseIdentifier: "MoviesCollectionViewCell")
         moviesPostsAPI()
         // Do any additional setup after loading the view.
@@ -42,6 +48,8 @@ class MoviesListCollectionViewController: UIViewController {
         
         if (Utility_Swift.isInternetConnected(isShowPopup: true)) {
             
+            activityIndicator.startAnimating()
+
             var dictionaryHeaders = [String : String]()
             dictionaryHeaders = ["Content-Type": "application/x-www-form-urlencoded"]
             
@@ -55,7 +63,8 @@ class MoviesListCollectionViewController: UIViewController {
                     
                     switch response.result {
                     case .success(let responseValue) :
-                        
+                        self.activityIndicator.stopAnimating()
+
                         if let tempDict = responseValue as? NSDictionary {
                             if let tempArray = tempDict["results"] as? NSArray {
                                 for singleData in tempArray {
